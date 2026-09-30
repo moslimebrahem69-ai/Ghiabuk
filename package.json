@@ -1,0 +1,13 @@
+{
+  "name": "ghiyabak",
+  "version": "1.0.0",
+  "description": "نظام إدارة الحضور والغياب للمدرسين",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "dev": "npx serve -l 3000 ."
+  },
+  "keywords": [],
+  "author": "Moslim Ebrahim",
+  "license": "ISC"
+}

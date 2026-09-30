@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>غيابك | بوابة الطالب</title>
+  <meta name="theme-color" content="#0b4fe0">
+  <meta name="description" content="غيابك - منصة الحضور والغياب: كارنيه QR للطالب، مجموعات، تسجيل حضور وحسابات">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="غيابك">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap"></noscript>
+  <link rel="stylesheet" href="style.css?v=5">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html">
+        <img class="logo" src="icons/icon-96.png" alt="غيابك" width="42" height="42">
+        <span class="brand-text"><b>غيابك</b><small>منصة الحضور والغياب</small></span>
+      </a>
+      <div class="toolbar">
+        <button class="btn sm" id="installBtn" type="button" hidden>
+          <svg class="ic" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M12 7v7M9 11l3 3 3-3M10 18h4"/></svg>
+          <span class="lbl">ثبّت التطبيق</span>
+        </button>
+        <a href="teacher.html" class="btn outline sm" id="teacherLink">
+          <svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+          لوحة المدرس
+        </a>
+        <button class="btn danger sm" id="logoutBtn" type="button" hidden>
+          <svg class="ic" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          <span class="lbl">خروج</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- ===== تسجيل / دخول ===== -->
+    <section id="authView" class="auth">
+      <aside class="auth-brand">
+        <img class="brand-logo" src="icons/logo-240.jpg" alt="غيابك - منصة الحضور والغياب" width="116" height="118" fetchpriority="high">
+        <span class="pill-label">✨ منصة الحضور والغياب</span>
+        <h1>حضورك في الحصة<br>بقى بـ <span class="hl">QR</span></h1>
+        <p>اعمل حسابك في دقيقة، خد كود طالب وكارنيه QR خاص بيك، والمدرس يسجل حضورك بمسحة واحدة.</p>
+        <ul class="features">
+          <li><span class="fi"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg></span>كارنيه QR خاص بيك</li>
+          <li><span class="fi"><svg class="ic" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>احضر مع أي مجموعة في صفك</li>
+          <li><span class="fi"><svg class="ic" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>تابع حضورك وحسابك أول بأول</li>
+        </ul>
+        <div class="mini-card">
+          <span class="mq"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg></span>
+          <span><small>كود الطالب</small><b class="mc">55101</b><small>✓ تم تسجيل الحضور</small></span>
+        </div>
+      </aside>
+
+      <div class="auth-form">
+        <div class="hero">
+          <h1>أهلاً بيك 👋</h1>
+          <p>اعمل حساب جديد، أو ادخل لو عندك حساب</p>
+        </div>
+        <div>
+          <div class="tabs">
+            <button class="tab active" data-tab="register" type="button">حساب جديد</button>
+            <button class="tab" data-tab="login" type="button">تسجيل الدخول</button>
+          </div>
+
+          <form id="registerForm" novalidate>
+            <div class="field">
+              <label for="rName">الاسم بالكامل</label>
+              <input id="rName" autocomplete="name" required>
+            </div>
+            <div class="field">
+              <label for="rPhone">رقم الهاتف</label>
+              <input id="rPhone" type="tel" inputmode="numeric" maxlength="11" placeholder="01xxxxxxxxx" autocomplete="tel" required>
+            </div>
+            <div class="field">
+              <span class="label">النوع</span>
+              <div class="chips">
+                <label><input type="radio" name="rGender" value="ذكر"> ذكر</label>
+                <label><input type="radio" name="rGender" value="أنثى"> أنثى</label>
+              </div>
+            </div>
+            <div class="field">
+              <label for="rGov">المحافظة</label>
+              <select id="rGov" required><option value="">اختار المحافظة</option></select>
+            </div>
+            <div class="row">
+              <div class="field">
+                <label for="rGrade">الصف</label>
+                <select id="rGrade" required>
+                  <option value="">اختار الصف</option>
+                  <option value="1">الأول الثانوي</option>
+                  <option value="2">الثاني الثانوي</option>
+                  <option value="3">الثالث الثانوي</option>
+                </select>
+              </div>
+              <div class="field" id="rTrackField">
+                <label for="rTrack">الشعبة</label>
+                <select id="rTrack" required><option value="">اختار الشعبة</option></select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="field">
+                <label for="rPass">كلمة السر</label>
+                <input id="rPass" type="password" autocomplete="new-password" required>
+              </div>
+              <div class="field">
+                <label for="rPass2">تأكيد كلمة السر</label>
+                <input id="rPass2" type="password" autocomplete="new-password" required>
+              </div>
+            </div>
+            <button class="btn block" type="submit">إنشاء الحساب</button>
+          </form>
+
+          <form id="loginForm" novalidate hidden>
+            <div class="field">
+              <label for="lPhone">رقم الهاتف</label>
+              <input id="lPhone" type="tel" inputmode="numeric" maxlength="11" placeholder="01xxxxxxxxx" autocomplete="tel" required>
+            </div>
+            <div class="field">
+              <label for="lPass">كلمة السر</label>
+              <input id="lPass" type="password" autocomplete="current-password" required>
+            </div>
+            <button class="btn block" type="submit">دخول</button>
+          </form>
+
+          <p id="authMsg" class="msg" role="alert"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== مساحة الطالب ===== -->
+    <section id="studentArea" hidden>
+      <nav class="nav student-nav" id="sNav">
+        <button type="button" data-sview="card" class="active">
+          <svg class="ic" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M14 10h4M14 14h4"/></svg>
+          الكارنيه
+        </button>
+        <button type="button" data-sview="profile">
+          <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
+          بياناتي
+        </button>
+        <button type="button" data-sview="guide">
+          <svg class="ic" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5V21h16"/></svg>
+          إزاي المنصة شغالة
+        </button>
+      </nav>
+
+      <!-- ----- الكارنيه ----- -->
+      <div class="sview" id="sview-card">
+        <div class="hero">
+          <h1 id="welcome"></h1>
+          <p>ده الكارنيه بتاعك، وريه للمدرس عشان يسجل حضورك</p>
+        </div>
+
+        <div class="id-card" id="idCard">
+          <div class="id-head">
+            <img class="logo" src="icons/icon-96.png" alt="غيابك" width="42" height="42">
+            <div><b>غيابك</b><small>كارنيه الطالب</small></div>
+          </div>
+          <div class="id-body">
+            <div class="avatar" id="cAvatar"></div>
+            <div class="id-name" id="cName"></div>
+            <div class="id-code">كود الطالب <b id="cCode"></b></div>
+            <div id="qr" class="qr"></div>
+            <dl class="id-meta">
+              <div><dt>الصف</dt><dd id="cGrade"></dd></div>
+              <div><dt>الشعبة</dt><dd id="cTrack"></dd></div>
+              <div><dt>المحافظة</dt><dd id="cGov"></dd></div>
+              <div><dt>النوع</dt><dd id="cGender"></dd></div>
+            </dl>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" id="dlBtn" type="button">
+            <svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            تحميل QR
+          </button>
+          <button class="btn outline" id="printBtn" type="button">
+            <svg class="ic" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            طباعة الكارنيه
+          </button>
+          <button class="btn ghost" type="button" data-go="profile">
+            <svg class="ic" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+            تعديل بياناتي
+          </button>
+        </div>
+
+        <div class="card narrow">
+          <h3>الحصص اللي حضرتها <span class="muted" id="attCount"></span></h3>
+          <div id="attList" class="att-list"></div>
+        </div>
+      </div>
+
+      <!-- ----- بياناتي ----- -->
+      <div class="sview narrow" id="sview-profile" hidden>
+        <div class="hero">
+          <h1>بياناتي</h1>
+          <p>تقدر تعدّل بياناتك في أي وقت. كود الطالب <b class="ltr-inline" id="pCode"></b> ثابت ومش بيتغير.</p>
+        </div>
+        <form id="profileForm" class="card" novalidate>
+          <div class="field">
+            <label for="pName">الاسم بالكامل</label>
+            <input id="pName" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label for="pPhone">رقم الهاتف</label>
+            <input id="pPhone" type="tel" inputmode="numeric" maxlength="11" autocomplete="tel" required>
+            <small class="muted">ده الرقم اللي بتدخل بيه المنصة</small>
+          </div>
+          <div class="field">
+            <span class="label">النوع</span>
+            <div class="chips">
+              <label><input type="radio" name="pGender" value="ذكر"> ذكر</label>
+              <label><input type="radio" name="pGender" value="أنثى"> أنثى</label>
+            </div>
+          </div>
+          <div class="field">
+            <label for="pGov">المحافظة</label>
+            <select id="pGov" required><option value="">اختار المحافظة</option></select>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="pGrade">الصف</label>
+              <select id="pGrade" required>
+                <option value="">اختار الصف</option>
+                <option value="1">الأول الثانوي</option>
+                <option value="2">الثاني الثانوي</option>
+                <option value="3">الثالث الثانوي</option>
+              </select>
+            </div>
+            <div class="field" id="pTrackField">
+              <label for="pTrack">الشعبة</label>
+              <select id="pTrack" required><option value="">اختار الشعبة</option></select>
+            </div>
+          </div>
+
+          <details class="pass-box" id="passBox">
+            <summary>تغيير كلمة السر</summary>
+            <div class="row">
+              <div class="field">
+                <label for="pNewPass">كلمة السر الجديدة</label>
+                <input id="pNewPass" type="password" autocomplete="new-password">
+              </div>
+              <div class="field">
+                <label for="pNewPass2">تأكيد كلمة السر الجديدة</label>
+                <input id="pNewPass2" type="password" autocomplete="new-password">
+              </div>
+            </div>
+          </details>
+
+          <div class="confirm-box">
+            <div class="field" style="margin:0">
+              <label for="pCurPass">كلمة السر الحالية</label>
+              <input id="pCurPass" type="password" autocomplete="current-password" required>
+              <small class="muted">لازم تكتبها عشان نتأكد إنك صاحب الحساب قبل ما نحفظ</small>
+            </div>
+          </div>
+
+          <button class="btn block" type="submit">حفظ التعديلات</button>
+          <p id="profileMsg" class="msg" role="alert"></p>
+        </form>
+      </div>
+
+      <!-- ----- إزاي المنصة شغالة ----- -->
+      <div class="sview" id="sview-guide" hidden>
+        <div class="guide-hero">
+          <img class="guide-logo" src="icons/icon-128.png" alt="" width="64" height="64" loading="lazy">
+          <h1 id="guideTitle">إزاي منصة غيابك شغالة</h1>
+          <p id="guideSub">كل اللي محتاج تعرفه في دقيقة</p>
+          <div class="guide-code">كود الطالب بتاعك <b id="gCode"></b></div>
+        </div>
+
+        <ol class="steps">
+          <li class="step">
+            <span class="num"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg></span>
+            <div>
+              <h3>الكارنيه والـ QR بتوعك</h3>
+              <p>أول ما عملت الحساب اتعملك <b>كود طالب</b> ثابت و<b>QR Code</b> خاص بيك. احفظ صورة الـ QR على موبايلك من زرار "تحميل QR"، أو اطبع الكارنيه وخليه معاك.</p>
+            </div>
+          </li>
+          <li class="step">
+            <span class="num"><svg class="ic" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+            <div>
+              <h3>مواعيد المجموعات</h3>
+              <p id="gGroup"></p>
+            </div>
+          </li>
+          <li class="step">
+            <span class="num"><svg class="ic" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10"/></svg></span>
+            <div>
+              <h3>تسجيل الحضور</h3>
+              <p>أول ما توصل الحصة، وري الـ QR للمدرس أو المساعد. بيمسحه من لوحة المدرس ويتسجل حضورك في ثانية، ومش بيتسجل مرتين في نفس الحصة.</p>
+            </div>
+          </li>
+          
+          <li class="step">
+            <span class="num"><svg class="ic" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+            <div>
+              <h3>تابع حضورك</h3>
+              <p>من صفحة "الكارنيه" تقدر تشوف كل الحصص اللي حضرتها، برقم الحصة وتاريخها والمجموعة اللي حضرت معاها.</p>
+            </div>
+          </li>
+          <li class="step">
+            <span class="num"><svg class="ic" viewBox="0 0 24 24"><path d="M20 7H5a2 2 0 0 1 0-4h13v4"/><path d="M3 5v14a2 2 0 0 0 2 2h15V7"/><circle cx="16" cy="14" r="1.5"/></svg></span>
+            <div>
+              <h3>الحساب على قد حضورك</h3>
+              <p>المبلغ بيتحسب على عدد الحصص اللي حضرتها فعلًا. يعني لو سعر الشهر 400 جنيه لـ 12 حصة وحضرت 9 حصص، هتدفع 300 جنيه بس.</p>
+            </div>
+          </li>
+          <li class="step">
+            <span class="num"><svg class="ic" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></span>
+            <div>
+              <h3>بياناتك في إيدك</h3>
+              <p>لو غيرت رقمك أو عاوز تغير كلمة السر، ادخل على "بياناتي" وعدّل في أي وقت.</p>
+            </div>
+          </li>
+        </ol>
+
+        <div class="note">
+          <span>💡</span><span><b>خلي بالك:</b> بتدخل المنصة برقم الهاتف وكلمة السر، فخليهم معاك وما تديش كلمة السر لحد.</span>
+        </div>
+
+        <div class="actions" style="margin-top:20px">
+          <button class="btn" type="button" data-go="card" id="guideCta">شوف الكارنيه بتاعي</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+  <script defer src="pwa.js?v=5"></script>
+  <script defer src="config.js?v=5"></script>
+  <script defer src="app.js?v=5"></script>
+</body>
+</html>

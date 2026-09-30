@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>غيابك | لوحة المدرس</title>
+  <meta name="theme-color" content="#0b4fe0">
+  <meta name="description" content="غيابك - منصة الحضور والغياب: كارنيه QR للطالب، مجموعات، تسجيل حضور وحسابات">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="manifest" href="manifest-teacher.webmanifest">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="لوحة غيابك">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap"></noscript>
+  <link rel="stylesheet" href="style.css?v=5">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="teacher.html">
+        <img class="logo" src="icons/icon-96.png" alt="غيابك" width="42" height="42">
+        <span class="brand-text"><b>غيابك</b><small>لوحة المدرس</small></span>
+      </a>
+      <div class="toolbar">
+        <button class="btn sm" id="installBtn" type="button" hidden>
+          <svg class="ic" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M12 7v7M9 11l3 3 3-3M10 18h4"/></svg>
+          <span class="lbl">ثبّت التطبيق</span>
+        </button>
+        <a href="index.html" class="btn outline sm">
+          <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
+          <span class="lbl">بوابة الطالب</span>
+        </a>
+        <button class="btn danger sm" id="logoutBtn" type="button" hidden>
+          <svg class="ic" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          <span class="lbl">خروج</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- ===== دخول المدرس ===== -->
+    <section id="loginView" class="auth">
+      <aside class="auth-brand">
+        <img class="brand-logo" src="icons/logo-240.jpg" alt="غيابك - منصة الحضور والغياب" width="116" height="118" fetchpriority="high">
+        <span class="pill-label">🎓 لوحة المدرس</span>
+        <h1>كل حصصك<br>في <span class="hl">مكان واحد</span></h1>
+        <p>نظم مجموعاتك، سجل الحضور بمسحة QR، وتابع الغياب والحسابات من غير ورق.</p>
+        <ul class="features">
+          <li><span class="fi"><svg class="ic" viewBox="0 0 24 24"><path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></svg></span>المجموعات والمواعيد لكل صف</li>
+          <li><span class="fi"><svg class="ic" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10"/></svg></span>تسجيل الحضور بالـ QR</li>
+          <li><span class="fi"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg></span>سجل حضور وتقرير PDF لكل صف</li>
+          <li><span class="fi"><svg class="ic" viewBox="0 0 24 24"><path d="M20 7H5a2 2 0 0 1 0-4h13v4"/><path d="M3 5v14a2 2 0 0 0 2 2h15V7"/><circle cx="16" cy="14" r="1.5"/></svg></span>الحسابات والمدفوعات</li>
+        </ul>
+      </aside>
+      <form id="loginForm" class="auth-form" novalidate>
+        <div class="hero"><h1>دخول المدرس</h1><p>ادخل بالإيميل وكلمة السر بتوع حساب المدرس</p></div>
+        <div class="field">
+          <label for="tEmail">الإيميل</label>
+          <input id="tEmail" type="email" class="ltr" autocomplete="username" required>
+        </div>
+        <div class="field">
+          <label for="tPass">كلمة السر</label>
+          <input id="tPass" type="password" autocomplete="current-password" required>
+        </div>
+        <button class="btn block" type="submit">دخول</button>
+        <p id="loginMsg" class="msg err" role="alert"></p>
+      </form>
+    </section>
+
+    <!-- ===== اللوحة ===== -->
+    <section id="dashView" class="dash" hidden>
+      <aside class="side">
+        <nav class="nav side-nav" id="nav">
+          <button type="button" data-view="home" class="active">
+            <svg class="ic" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>الرئيسية</button>
+          <button type="button" data-view="groups">
+            <svg class="ic" viewBox="0 0 24 24"><path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></svg>المجموعات</button>
+          <button type="button" data-view="scan">
+            <svg class="ic" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10"/></svg>تسجيل الحضور</button>
+          <button type="button" data-view="register">
+            <svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>سجل الحضور</button>
+          <button type="button" data-view="payments">
+            <svg class="ic" viewBox="0 0 24 24"><path d="M20 7H5a2 2 0 0 1 0-4h13v4"/><path d="M3 5v14a2 2 0 0 0 2 2h15V7"/><circle cx="16" cy="14" r="1.5"/></svg>الحسابات</button>
+          <button type="button" data-view="students">
+            <svg class="ic" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>الطلاب</button>
+        </nav>
+        <div class="side-foot"><b>أهلاً بيك 👋</b><span id="teacherEmail"></span></div>
+      </aside>
+
+      <div class="dash-main">
+      <!-- ===== الرئيسية ===== -->
+      <div class="view" id="view-home">
+        <div class="page-title"><div><h1>الرئيسية</h1><p>نظرة سريعة على طلابك</p></div></div>
+        <div class="stats">
+          <div class="stat main"><div class="k"><span class="si"><svg class="ic" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>إجمالي الطلاب</div><div class="v" id="stTotal">0</div><div class="s" id="stGender"></div></div>
+          <div class="stat"><div class="k"><span class="si">1</span>الأول الثانوي</div><div class="v" id="stG1">0</div><div class="s" id="stG1s"></div></div>
+          <div class="stat"><div class="k"><span class="si">2</span>الثاني الثانوي</div><div class="v" id="stG2">0</div><div class="s" id="stG2s"></div></div>
+          <div class="stat"><div class="k"><span class="si">3</span>الثالث الثانوي</div><div class="v" id="stG3">0</div><div class="s" id="stG3s"></div></div>
+        </div>
+        <div class="card">
+          <div class="section-head"><h2>توزيع الطلاب</h2></div>
+          <div class="table-wrap">
+            <table class="breakdown">
+              <thead><tr><th>الصف</th><th>أدبي</th><th>علمي علوم</th><th>علمي رياضة</th><th>ذكور</th><th>إناث</th><th>المجموعات</th><th>الإجمالي</th></tr></thead>
+              <tbody id="breakdownBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== المجموعات ===== -->
+      <div class="view" id="view-groups" hidden>
+        <div class="card">
+          <div class="section-head">
+            <h2>إدارة الصفوف والمجموعات</h2>
+            <div class="seg grade-seg"></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>المجموعة</th><th>الوقت</th><th>أيام الحصص</th><th>الحالة</th><th></th></tr></thead>
+              <tbody id="groupsBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <form class="card" id="groupForm" novalidate>
+          <h2 id="groupFormTitle">إضافة مجموعة جديدة</h2>
+          <div class="row3">
+            <div class="field">
+              <label for="gName">اسم المجموعة</label>
+              <input id="gName" required>
+            </div>
+            <div class="field">
+              <label for="gTime">وقت المجموعة</label>
+              <input id="gTime" type="time" required>
+            </div>
+          </div>
+          <div class="field">
+            <span class="label">أيام الحصص</span>
+            <div class="chips day-chips" id="gDays"></div>
+          </div>
+          <div class="toolbar">
+            <button class="btn" type="submit" id="groupSave">إضافة المجموعة</button>
+            <button class="btn ghost" type="button" id="groupCancel" hidden>إلغاء التعديل</button>
+          </div>
+          <p id="groupMsg" class="msg err"></p>
+        </form>
+      </div>
+
+      <!-- ===== تسجيل الحضور ===== -->
+      <div class="view" id="view-scan" hidden>
+        <div class="card" id="startCard">
+          <h2>بدء تسجيل الحضور</h2>
+          <div class="field">
+            <span class="label">الصف</span>
+            <div class="seg grade-seg"></div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="sGroup">المجموعة</label>
+              <select id="sGroup"></select>
+            </div>
+            <div class="field">
+              <label for="sLesson">رقم الحصة</label>
+              <input id="sLesson" type="number" min="1" inputmode="numeric">
+            </div>
+          </div>
+          <p class="muted" id="sHint" style="margin-top:0"></p>
+          <button class="btn block" id="startBtn" type="button">بدء تسجيل الحضور</button>
+        </div>
+
+        <div id="liveView" hidden>
+          <div class="card live-head">
+            <div>
+              <div class="muted"><span class="live-dot"></span>الحصة الجارية</div>
+              <h2 id="liveTitle"></h2>
+              <div class="muted" id="liveSub"></div>
+            </div>
+            <div class="toolbar">
+              <button class="btn ghost" id="liveSheetBtn" type="button">📄 كشف الحصة PDF</button>
+              <button class="btn danger" id="endBtn" type="button">إنهاء الحصة</button>
+            </div>
+          </div>
+          <div class="grid2">
+            <div class="card">
+              <div class="section-head">
+                <h2>امسح الـ QR</h2>
+              </div>
+              <div class="scan-actions">
+                <button class="btn" id="camBtn" type="button">📷 تشغيل الكاميرا</button>
+                <button class="btn ghost" id="switchCamBtn" type="button" hidden>🔄 تبديل الكاميرا</button>
+                <label class="btn ghost" for="qrFile">📸 صوّر الـ QR</label>
+                <input type="file" id="qrFile" accept="image/*" capture="environment" hidden>
+              </div>
+              <div id="camHelp" class="cam-help" hidden></div>
+              <div id="reader"></div>
+              <div id="qrFileReader" hidden></div>
+              <form id="manualForm" class="toolbar" style="margin-top:12px">
+                <input id="manualCode" class="ltr" inputmode="numeric" placeholder="اكتب الكود أو استخدم جهاز الاسكانر" autocomplete="off">
+                <button class="btn" type="submit">تسجيل</button>
+              </form>
+              <div id="scanResult" class="scan-result" hidden></div>
+            </div>
+            <div class="card">
+              <div class="section-head"><h2>الحاضرين <span class="muted" id="liveCount"></span></h2></div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>الوقت</th><th>الكود</th><th>الاسم</th><th></th></tr></thead>
+                  <tbody id="liveBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-head"><h2>آخر الحصص</h2></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>التاريخ</th><th>الصف</th><th>المجموعة</th><th>الحصة</th><th>الحضور</th><th>الحالة</th><th></th></tr></thead>
+              <tbody id="recentBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== سجل الحضور ===== -->
+      <div class="view" id="view-register" hidden>
+        <div class="card">
+          <div class="section-head">
+            <h2>سجل الحضور</h2>
+            <div class="toolbar">
+              <div class="seg grade-seg"></div>
+              <button class="btn sm" id="regPdf" type="button">تحميل PDF</button>
+            </div>
+          </div>
+          <div class="legend">
+            <span><b class="m-yes">حضر</b> (وتحتها ميعاد المجموعة اللي حضر معاها)</span>
+            <span><b class="m-no">غائب</b></span>
+            <span><b class="m-na">—</b> لسه ماكانش مسجل</span>
+          </div>
+          <div id="regContent"></div>
+        </div>
+      </div>
+
+      <!-- ===== الحسابات ===== -->
+      <div class="view" id="view-payments" hidden>
+        <div class="card">
+          <div class="section-head">
+            <h2>الحسابات</h2>
+            <div class="seg grade-seg"></div>
+          </div>
+          <form id="settingsForm" class="toolbar" novalidate>
+            <div class="inline-field"><label for="setPrice">سعر الصف (جنيه)</label><input id="setPrice" type="number" min="0" step="1" inputmode="numeric"></div>
+            <div class="inline-field"><label for="setCount">عدد الحصص</label><input id="setCount" type="number" min="1" step="1" inputmode="numeric"></div>
+            <button class="btn sm" type="submit">حفظ</button>
+          </form>
+          <p class="muted" id="setHint" style="margin:10px 0 0"></p>
+        </div>
+
+        <div class="card">
+          <div class="section-head">
+            <h2 id="payTitle"></h2>
+            <div class="toolbar">
+              <select id="payPeriod"></select>
+              <select id="payFilter">
+                <option value="">الكل</option>
+                <option value="unpaid">لم يدفع</option>
+                <option value="paid">دفع</option>
+              </select>
+              <input id="paySearch" placeholder="بحث بالاسم أو الكود">
+              <button class="btn sm" id="payPdf" type="button">تحميل PDF</button>
+            </div>
+          </div>
+          <div class="totals" id="payTotals"></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>الطالب</th><th>الكود</th><th>عدد الحصص</th><th>حضر</th><th>غاب</th><th>المبلغ المستحق</th><th>حالة الدفع</th></tr></thead>
+              <tbody id="payBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== الطلاب ===== -->
+      <div class="view" id="view-students" hidden>
+        <div class="card">
+          <div class="section-head">
+            <h2>كل الطلاب <span class="muted" id="studentsCount"></span></h2>
+            <div class="toolbar">
+              <input id="search" placeholder="بحث بالاسم أو الكود أو الهاتف">
+              <select id="fGrade"><option value="">كل الصفوف</option></select>
+              <select id="fTrack"><option value="">كل الشعب</option></select>
+              <button class="btn sm" id="qrPdfBtn" type="button">🎴 طباعة كروت الـ QR</button>
+              <button class="btn ghost sm" id="csvBtn" type="button">تصدير Excel</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>الكود</th><th>الاسم</th><th>الهاتف</th><th>النوع</th><th>المحافظة</th><th>الصف</th><th>الشعبة</th><th>تاريخ التسجيل</th></tr></thead>
+              <tbody id="studentsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      </div><!-- /dash-main -->
+    </section>
+  </main>
+
+  <!-- حاوية الطباعة للكروت على أوراق A4 -->
+  <div id="printQrArea" class="print-qr-area"></div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+  <script defer src="pwa.js?v=5"></script>
+  <script defer src="config.js?v=5"></script>
+  <script defer src="teacher.js?v=5"></script>
+</body>
+</html>
