@@ -162,8 +162,9 @@ function showView(view) {
 }
 
 function renderGradeSegs() {
+  const gradesList = Object.keys(GRADES).map(Number);
   document.querySelectorAll(".grade-seg").forEach(seg => {
-    seg.innerHTML = [1, 2, 3].map(g =>
+    seg.innerHTML = gradesList.map(g =>
       `<button type="button" data-grade="${g}" class="${g === state.grade ? "active" : ""}">${GRADES[g]}</button>`).join("");
   });
 }
@@ -194,17 +195,22 @@ async function renderView() {
 // ================= الرئيسية =================
 function renderHome() {
   const S = state.students;
+  const gradesList = Object.keys(GRADES).map(Number);
 
   const count = f => S.filter(f).length;
   $("stTotal").textContent = S.length;
   $("stGender").textContent = `ذكور ${count(s => s.gender === "ذكر")} · إناث ${count(s => s.gender === "أنثى")}`;
-  for (const g of [1, 2, 3]) {
+
+  for (const g of gradesList) {
     const list = S.filter(s => s.grade === g);
-    $("stG" + g).textContent = list.length;
-    $("stG" + g + "s").textContent = (TRACKS_BY_GRADE[g] || []).map(t => `${t} ${list.filter(s => s.track === t).length}`).join(" · ");
+    const elV = $("stG" + g);
+    const elS = $("stG" + g + "s");
+    if (elV) elV.textContent = list.length;
+    if (elS) elS.textContent = (TRACKS_BY_GRADE[g] || []).map(t => `${t} ${list.filter(s => s.track === t).length}`).join(" · ");
   }
+
   const row = (label, list, groups, strong) => {
-    const allTracks = ["أدبي", "علمي علوم", "علمي رياضة"];
+    const allTracks = ["عام", "أدبي", "علمي", "علمي علوم", "علمي رياضة"];
     const cells = [
       ...allTracks.map(t => list.filter(s => s.track === t).length),
       list.filter(s => s.gender === "ذكر").length,
@@ -215,8 +221,9 @@ function renderHome() {
     const wrap = v => (strong ? `<b>${v}</b>` : v);
     return `<tr><td>${wrap(label)}</td>${cells.map(c => `<td>${wrap(c)}</td>`).join("")}</tr>`;
   };
+
   $("breakdownBody").innerHTML =
-    [1, 2, 3].map(g => row(GRADES[g], S.filter(s => s.grade === g), gradeGroups(g, true).length)).join("") +
+    gradesList.map(g => row(GRADES[g], S.filter(s => s.grade === g), gradeGroups(g, true).length)).join("") +
     row("الإجمالي", S, state.groups.filter(g => g.active).length, true);
 }
 
@@ -967,19 +974,19 @@ function printDoc(title, subtitle, bodyHTML, extraClass, landscape = true) {
 
 // ================= الطلاب =================
 const gradeOpts = Object.entries(GRADES).map(([v, t]) => `<option value="${v}">${t}</option>`).join("");
-$("fGrade").insertAdjacentHTML("beforeend", gradeOpts);
+$("fGrade")?.insertAdjacentHTML("beforeend", gradeOpts);
 
 // تحديث خيارات الشعب حسب الصف المختار في الفلتر
 function updateFilterTracks() {
-  const gradeVal = $("fGrade").value;
+  const gradeVal = $("fGrade")?.value;
   const trackSelect = $("fTrack");
   if (!trackSelect) return;
 
-  const tracks = gradeVal ? (TRACKS_BY_GRADE[gradeVal] || []) : ["أدبي", "علمي علوم", "علمي رياضة"];
+  const tracks = gradeVal ? (TRACKS_BY_GRADE[gradeVal] || []) : ["عام", "أدبي", "علمي", "علمي علوم", "علمي رياضة"];
   trackSelect.innerHTML = '<option value="">كل الشعب</option>' + tracks.map(t => `<option value="${t}">${t}</option>`).join("");
 }
 
-$("fGrade").addEventListener("change", () => {
+$("fGrade")?.addEventListener("change", () => {
   updateFilterTracks();
   renderStudents();
 });

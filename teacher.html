@@ -18,13 +18,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap"></noscript>
-  <link rel="stylesheet" href="style.css?v=5">
+  <link rel="stylesheet" href="style.css?v=6">
 </head>
-<body>
+<body class="has-bottom-nav">
   <header class="topbar">
     <div class="topbar-inner">
       <a class="brand" href="teacher.html">
-        <img class="logo" src="icons/icon-96.png" alt="غيابك" width="42" height="42">
+        <img class="logo" src="icons/icon-96.png" alt="غيابك" width="40" height="40">
         <span class="brand-text"><b>غيابك</b><small>لوحة المدرس</small></span>
       </a>
       <div class="toolbar">
@@ -99,16 +99,37 @@
       <div class="view" id="view-home">
         <div class="page-title"><div><h1>الرئيسية</h1><p>نظرة سريعة على طلابك</p></div></div>
         <div class="stats">
-          <div class="stat main"><div class="k"><span class="si"><svg class="ic" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>إجمالي الطلاب</div><div class="v" id="stTotal">0</div><div class="s" id="stGender"></div></div>
-          <div class="stat"><div class="k"><span class="si">1</span>الأول الثانوي</div><div class="v" id="stG1">0</div><div class="s" id="stG1s"></div></div>
-          <div class="stat"><div class="k"><span class="si">2</span>الثاني الثانوي</div><div class="v" id="stG2">0</div><div class="s" id="stG2s"></div></div>
-          <div class="stat"><div class="k"><span class="si">3</span>الثالث الثانوي</div><div class="v" id="stG3">0</div><div class="s" id="stG3s"></div></div>
+          <div class="stat main">
+            <div class="k"><span class="si"><svg class="ic" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>إجمالي الطلاب</div>
+            <div class="v" id="stTotal">0</div>
+            <div class="s" id="stGender"></div>
+          </div>
+          <div class="stat">
+            <div class="k"><span class="si">1</span>الأول الثانوي</div>
+            <div class="v" id="stG1">0</div>
+            <div class="s" id="stG1s"></div>
+          </div>
+          <div class="stat">
+            <div class="k"><span class="si">2</span>الثاني الثانوي</div>
+            <div class="v" id="stG2">0</div>
+            <div class="s" id="stG2s"></div>
+          </div>
+          <div class="stat">
+            <div class="k"><span class="si">3</span>الثالث الثانوي</div>
+            <div class="v" id="stG3">0</div>
+            <div class="s" id="stG3s"></div>
+          </div>
+          <div class="stat">
+            <div class="k"><span class="si">4</span>الثاني بكالوريا</div>
+            <div class="v" id="stG4">0</div>
+            <div class="s" id="stG4s"></div>
+          </div>
         </div>
         <div class="card">
           <div class="section-head"><h2>توزيع الطلاب</h2></div>
           <div class="table-wrap">
             <table class="breakdown">
-              <thead><tr><th>الصف</th><th>أدبي</th><th>علمي علوم</th><th>علمي رياضة</th><th>ذكور</th><th>إناث</th><th>المجموعات</th><th>الإجمالي</th></tr></thead>
+              <thead><tr><th>الصف</th><th>عام</th><th>أدبي</th><th>علمي</th><th>علمي علوم</th><th>علمي رياضة</th><th>ذكور</th><th>إناث</th><th>المجموعات</th><th>الإجمالي</th></tr></thead>
               <tbody id="breakdownBody"></tbody>
             </table>
           </div>
@@ -298,7 +319,7 @@
               <input id="search" placeholder="بحث بالاسم أو الكود أو الهاتف">
               <select id="fGrade"><option value="">كل الصفوف</option></select>
               <select id="fTrack"><option value="">كل الشعب</option></select>
-              <button class="btn sm" id="qrPdfBtn" type="button">🎴 طباعة كروت الـ QR</button>
+              <button class="btn sm" id="qrPdfBtn" type="button"> طباعة كروت الـ QR</button>
               <button class="btn ghost sm" id="csvBtn" type="button">تصدير Excel</button>
             </div>
           </div>
@@ -321,8 +342,8 @@
 
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
-  <script defer src="pwa.js?v=5"></script>
-  <script defer src="config.js?v=5"></script>
-  <script defer src="teacher.js?v=5"></script>
+  <script defer src="pwa.js?v=6"></script>
+  <script defer src="config.js?v=6"></script>
+  <script defer src="teacher.js?v=6"></script>
 </body>
 </html>

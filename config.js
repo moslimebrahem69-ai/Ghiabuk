@@ -4,13 +4,19 @@ const SUPABASE_KEY = "sb_publishable_kebX7bXD_jtzItzeTGjzfA_6byBy60e";
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const GRADES = { 1: "الأول الثانوي", 2: "الثاني الثانوي", 3: "الثالث الثانوي" };
+const GRADES = { 
+  1: "الأول الثانوي", 
+  2: "الثاني الثانوي", 
+  3: "الثالث الثانوي",
+  4: "الثاني بكالوريا"
+};
 
 // الشعب الخاصة لكل صف
 const TRACKS_BY_GRADE = {
   1: ["عام"],
-  2: ["علمي", "أدبي", "بكالوريا"],
-  3: ["علمي علوم", "علمي رياضة", "أدبي"]
+  2: ["علمي", "أدبي"],
+  3: ["علمي علوم", "علمي رياضة", "أدبي"],
+  4: ["عام"]
 };
 
 const GOVERNORATES = [
