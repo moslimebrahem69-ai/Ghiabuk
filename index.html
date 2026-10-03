@@ -14,17 +14,19 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="غيابك">
+  
+  <!-- تحسين الربط والسرعة لتقليل LCP & FCP -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap"></noscript>
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="style.css?v=7">
 </head>
 <body class="has-bottom-nav">
   <header class="topbar">
     <div class="topbar-inner">
       <a class="brand" href="index.html">
-        <img class="logo" src="icons/icon-96.png" alt="غيابك" width="40" height="40">
+        <img class="logo" src="icons/icon-96.png" alt="غيابك" width="40" height="40" decoding="async">
         <span class="brand-text"><b>غيابك</b><small>منصة الحضور والغياب</small></span>
       </a>
       <div class="toolbar">
@@ -48,7 +50,8 @@
     <!-- ===== تسجيل / دخول ===== -->
     <section id="authView" class="auth">
       <aside class="auth-brand">
-        <img class="brand-logo" src="icons/logo-240.jpg" alt="غيابك - منصة الحضور والغياب" width="116" height="118" fetchpriority="high">
+        <!-- ضبط الأبعاد والنسبة لمنع التشوه البصري وتحسين الـ LCP -->
+        <img class="brand-logo" src="icons/logo-240.jpg" alt="غيابك - منصة الحضور والغياب" width="116" height="118" fetchpriority="high" decoding="sync">
         <span class="pill-label">✨ منصة الحضور والغياب</span>
         <h1>حضورك في الحصة<br>بقى بـ <span class="hl">QR</span></h1>
         <p>اعمل حسابك في دقيقة، خد كود طالب وكارنيه QR خاص بيك، والمدرس يسجل حضورك بمسحة واحدة.</p>
@@ -166,7 +169,7 @@
 
         <div class="id-card" id="idCard">
           <div class="id-head">
-            <img class="logo" src="icons/icon-96.png" alt="غيابك" width="40" height="40">
+            <img class="logo" src="icons/icon-96.png" alt="غيابك" width="40" height="40" decoding="async">
             <div><b>غيابك</b><small>كارنيه الطالب</small></div>
           </div>
           <div class="id-body">
@@ -345,8 +348,8 @@
 
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
-  <script defer src="pwa.js?v=6"></script>
-  <script defer src="config.js?v=6"></script>
-  <script defer src="app.js?v=6"></script>
+  <script defer src="pwa.js?v=7"></script>
+  <script defer src="config.js?v=7"></script>
+  <script defer src="app.js?v=7"></script>
 </body>
 </html>
