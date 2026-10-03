@@ -15,18 +15,20 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="لوحة غيابك">
   
-  <!-- تحسين الربط والسرعة لتقليل LCP & FCP -->
+  <!-- تسريع الاتصال بالـ CDN والخطوط لتحسين FCP & LCP -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="image" href="icons/logo-240.jpg" fetchpriority="high">
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap"></noscript>
-  <link rel="stylesheet" href="style.css?v=7">
+  <link rel="stylesheet" href="style.css?v=8">
 </head>
 <body class="has-bottom-nav">
   <header class="topbar">
     <div class="topbar-inner">
       <a class="brand" href="teacher.html">
-        <img class="logo" src="icons/icon-96.png" alt="غيابك" width="40" height="40" decoding="async">
+        <img class="logo" src="icons/icon-96.png" alt="غيابك" width="96" height="96" decoding="async">
         <span class="brand-text"><b>غيابك</b><small>لوحة المدرس</small></span>
       </a>
       <div class="toolbar">
@@ -50,8 +52,7 @@
     <!-- ===== دخول المدرس ===== -->
     <section id="loginView" class="auth">
       <aside class="auth-brand">
-        <!-- ضبط الأبعاد والتوافق لضمان أسرع رسم بصري LCP -->
-        <img class="brand-logo" src="icons/logo-240.jpg" alt="غيابك - منصة الحضور والغياب" width="116" height="118" fetchpriority="high" decoding="sync">
+        <img class="brand-logo" src="icons/logo-240.jpg" alt="غيابك - منصة الحضور والغياب" width="240" height="245" fetchpriority="high" decoding="async">
         <span class="pill-label">🎓 لوحة المدرس</span>
         <h1>كل حصصك<br>في <span class="hl">مكان واحد</span></h1>
         <p>نظم مجموعاتك، سجل الحضور بمسحة QR، وتابع الغياب والحسابات من غير ورق.</p>
@@ -92,7 +93,7 @@
           <button type="button" data-view="payments">
             <svg class="ic" viewBox="0 0 24 24"><path d="M20 7H5a2 2 0 0 1 0-4h13v4"/><path d="M3 5v14a2 2 0 0 0 2 2h15V7"/><circle cx="16" cy="14" r="1.5"/></svg>الحسابات</button>
           <button type="button" data-view="students">
-            <svg class="ic" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>الطلاب</button>
+            <svg class="ic" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 1 0 7.75"/></svg>الطلاب</button>
         </nav>
         <div class="side-foot"><b>أهلاً بيك 👋</b><span id="teacherEmail"></span></div>
       </aside>
@@ -328,7 +329,7 @@
           </div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>الكود</th><th>الاسم</th><th>الهاتف</th><th>النوع</th><th>المحافظة</th><th>الصف</th><th>الشعبة</th><th>تاريخ التسجيل</th></tr></thead>
+              <thead><tr><th>الكود</th><th>الاسم</th><th>الهاتف</th><th>النوع</th><th>المافظة</th><th>الصف</th><th>الشعبة</th><th>تاريخ التسجيل</th></tr></thead>
               <tbody id="studentsBody"></tbody>
             </table>
           </div>
@@ -343,10 +344,11 @@
 
   <div id="toast" class="toast" hidden></div>
 
+  <!-- استخدام qrcode.min.js المدمجة والمضغوطة -->
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
-  <script defer src="pwa.js?v=7"></script>
-  <script defer src="config.js?v=7"></script>
-  <script defer src="teacher.js?v=7"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <script defer src="pwa.js?v=8"></script>
+  <script defer src="config.js?v=8"></script>
+  <script defer src="teacher.js?v=8"></script>
 </body>
 </html>
