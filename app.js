@@ -1,6 +1,24 @@
 const STORE_KEY = "ghiyabak_student";
+const THEME_KEY = "ghiyabak_theme";
 const $ = id => document.getElementById(id);
 let student = null;   // البيانات الخاصّة بالطالب
+
+// ----- إدارة الثيم (Light / Dark Mode) -----
+function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY) || "light";
+  document.documentElement.setAttribute("data-theme", saved);
+}
+initTheme();
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", current);
+  localStorage.setItem(THEME_KEY, current);
+}
+
+document.querySelectorAll("#themeToggle, .theme-toggle").forEach(btn => {
+  btn.addEventListener("click", toggleTheme);
+});
 
 // ----- تعبئة قائمة المحافظات -----
 for (const id of ["rGov", "pGov"]) {

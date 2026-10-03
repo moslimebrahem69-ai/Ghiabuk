@@ -8,21 +8,21 @@ const state = {
   grade: 1,
   students: [], byCode: new Map(),
   groups: [], groupById: new Map(),
-  settings: {},       // الصف -> { price, lessons_count }
-  gradeData: {},      // الصف -> { sessions, attendance, payments }
-  active: null,       // الحصة الجارية
-  live: [],           // حضور الحصة الجارية
+  settings: {},
+  gradeData: {},
+  active: null,
+  live: [],
   editingGroup: null,
-  period: {},         // الصف -> رقم الفترة المختارة في الحسابات
+  period: {},
 };
 let scanner = null;
 let lastScan = { code: null, at: 0 };
 let inDashboard = false;
 let sessionSubscription = null;
 
-// ================= أدوات عامة =================
 function toast(text) {
   const t = $("toast");
+  if (!t) return;
   t.textContent = text;
   t.hidden = false;
   clearTimeout(toast.timer);
@@ -50,21 +50,20 @@ async function fetchAll(table, cols, apply) {
   }
 }
 
-// ================= الدخول =================
-$("loginForm").addEventListener("submit", async e => {
+$("loginForm")?.addEventListener("submit", async e => {
   e.preventDefault();
   const btn = e.target.querySelector("button");
-  btn.disabled = true;
-  $("loginMsg").textContent = "";
+  if (btn) btn.disabled = true;
+  if ($("loginMsg")) $("loginMsg").textContent = "";
   const { error } = await sb.auth.signInWithPassword({
     email: $("tEmail").value.trim(),
     password: $("tPass").value
   });
-  btn.disabled = false;
-  if (error) $("loginMsg").textContent = errText(error);
+  if (btn) btn.disabled = false;
+  if (error && $("loginMsg")) $("loginMsg").textContent = errText(error);
 });
 
-$("logoutBtn").addEventListener("click", async () => {
+$("logoutBtn")?.addEventListener("click", async () => {
   await stopCamera();
   if (sessionSubscription) sb.removeChannel(sessionSubscription);
   await sb.auth.signOut();
@@ -72,7 +71,7 @@ $("logoutBtn").addEventListener("click", async () => {
 
 sb.auth.onAuthStateChange((_event, session) => {
   setTimeout(() => {
-    if (session) $("teacherEmail").textContent = session.user?.email || "";
+    if (session && $("teacherEmail")) $("teacherEmail").textContent = session.user?.email || "";
     if (session && !inDashboard) enterDashboard();
     else if (!session) showLogin();
   }, 0);
@@ -80,9 +79,9 @@ sb.auth.onAuthStateChange((_event, session) => {
 
 function showLogin() {
   inDashboard = false;
-  $("loginView").hidden = false;
-  $("dashView").hidden = true;
-  $("logoutBtn").hidden = true;
+  if ($("loginView")) $("loginView").hidden = false;
+  if ($("dashView")) $("dashView").hidden = true;
+  if ($("logoutBtn")) $("logoutBtn").hidden = true;
 }
 
 async function enterDashboard() {
@@ -90,12 +89,12 @@ async function enterDashboard() {
   const { data: ok, error } = await sb.rpc("is_teacher");
   if (error || !ok) {
     await sb.auth.signOut();
-    $("loginMsg").textContent = "الحساب ده مش متسجل كمدرس. ضيف الإيميل في جدول teachers.";
+    if ($("loginMsg")) $("loginMsg").textContent = "الحساب ده مش متسجل كمدرس.";
     return;
   }
-  $("loginView").hidden = true;
-  $("dashView").hidden = false;
-  $("logoutBtn").hidden = false;
+  if ($("loginView")) $("loginView").hidden = true;
+  if ($("dashView")) $("dashView").hidden = false;
+  if ($("logoutBtn")) $("logoutBtn").hidden = false;
   try {
     await Promise.all([loadStudents(), loadGroups(), loadSettings()]);
     await restoreActive();
@@ -104,19 +103,17 @@ async function enterDashboard() {
   showView(state.view);
 }
 
-// ================= المزامنة المباشرة (Realtime) =================
 function subscribeToSessions() {
   if (sessionSubscription) return;
   sessionSubscription = sb
     .channel('public:sessions')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'sessions' }, async payload => {
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'sessions' }, async () => {
       await restoreActive();
       if (state.view === "scan") renderScan();
     })
     .subscribe();
 }
 
-// ================= تحميل البيانات =================
 async function loadStudents() {
   state.students = await fetchAll("students", STUDENT_COLS, q => q.order("code"));
   state.byCode = new Map(state.students.map(s => [s.code, s]));
@@ -148,7 +145,6 @@ function invalidate(grade) { delete state.gradeData[grade]; }
 const gradeGroups = (grade, onlyActive = false) =>
   state.groups.filter(g => g.grade === grade && (!onlyActive || g.active));
 
-// ================= التنقل =================
 document.querySelectorAll("#nav button").forEach(b => b.addEventListener("click", () => showView(b.dataset.view)));
 
 function showView(view) {
@@ -185,21 +181,21 @@ async function renderView() {
   if (v === "students") return renderStudents();
 
   const target = v === "register" ? $("regContent") : $("payBody");
-  if (!state.gradeData[grade]) target.innerHTML = v === "register"
-    ? `<p class="empty">جاري التحميل...</p>` : `<tr><td colspan="8" class="empty">جاري التحميل...</td></tr>`;
+  if (target && !state.gradeData[grade]) {
+    target.innerHTML = v === "register" ? `<p class="empty">جاري التحميل...</p>` : `<tr><td colspan="8" class="empty">جاري التحميل...</td></tr>`;
+  }
   try { await loadGradeData(grade); } catch (err) { return toast(errText(err)); }
   if (state.view !== v || state.grade !== grade) return;
   v === "register" ? renderRegister() : renderPayments();
 }
 
-// ================= الرئيسية =================
 function renderHome() {
   const S = state.students;
   const gradesList = Object.keys(GRADES).map(Number);
 
   const count = f => S.filter(f).length;
-  $("stTotal").textContent = S.length;
-  $("stGender").textContent = `ذكور ${count(s => s.gender === "ذكر")} · إناث ${count(s => s.gender === "أنثى")}`;
+  if ($("stTotal")) $("stTotal").textContent = S.length;
+  if ($("stGender")) $("stGender").textContent = `ذكور ${count(s => s.gender === "ذكر")} · إناث ${count(s => s.gender === "أنثى")}`;
 
   for (const g of gradesList) {
     const list = S.filter(s => s.grade === g);
@@ -222,48 +218,51 @@ function renderHome() {
     return `<tr><td>${wrap(label)}</td>${cells.map(c => `<td>${wrap(c)}</td>`).join("")}</tr>`;
   };
 
-  $("breakdownBody").innerHTML =
-    gradesList.map(g => row(GRADES[g], S.filter(s => s.grade === g), gradeGroups(g, true).length)).join("") +
-    row("الإجمالي", S, state.groups.filter(g => g.active).length, true);
+  if ($("breakdownBody")) {
+    $("breakdownBody").innerHTML =
+      gradesList.map(g => row(GRADES[g], S.filter(s => s.grade === g), gradeGroups(g, true).length)).join("") +
+      row("الإجمالي", S, state.groups.filter(g => g.active).length, true);
+  }
 }
 
-// ================= المجموعات =================
-$("gDays").innerHTML = DAYS.map((d, i) => `<label><input type="checkbox" value="${i}"> ${d}</label>`).join("");
+if ($("gDays")) {
+  $("gDays").innerHTML = DAYS.map((d, i) => `<label><input type="checkbox" value="${i}"> ${d}</label>`).join("");
+}
 
 function renderGroups() {
   const list = gradeGroups(state.grade);
-
-  $("groupsBody").innerHTML = list.length
-    ? list.map(g => `<tr>
-        <td><b>${esc(g.name)}</b></td>
-        <td>${fmtTime(g.start_time)}</td>
-        <td>${esc(fmtDays(g.days)) || "—"}</td>
-        <td>${g.active ? `<span class="badge ok">شغالة</span>` : `<span class="badge off">موقوفة</span>`}</td>
-        <td><div class="row-actions">
-          <button class="btn ghost sm" data-act="edit" data-id="${g.id}" type="button">تعديل</button>
-          <button class="btn ghost sm" data-act="toggle" data-id="${g.id}" type="button">${g.active ? "إيقاف" : "تشغيل"}</button>
-          <button class="btn danger sm" data-act="del" data-id="${g.id}" type="button">حذف</button>
-        </div></td></tr>`).join("")
-    : `<tr><td colspan="5" class="empty">مفيش مجموعات للصف ده لسه، ضيف أول مجموعة من تحت</td></tr>`;
-
+  if ($("groupsBody")) {
+    $("groupsBody").innerHTML = list.length
+      ? list.map(g => `<tr>
+          <td><b>${esc(g.name)}</b></td>
+          <td>${fmtTime(g.start_time)}</td>
+          <td>${esc(fmtDays(g.days)) || "—"}</td>
+          <td>${g.active ? `<span class="badge ok">شغالة</span>` : `<span class="badge off">موقوفة</span>`}</td>
+          <td><div class="row-actions">
+            <button class="btn ghost sm" data-act="edit" data-id="${g.id}" type="button">تعديل</button>
+            <button class="btn ghost sm" data-act="toggle" data-id="${g.id}" type="button">${g.active ? "إيقاف" : "تشغيل"}</button>
+            <button class="btn danger sm" data-act="del" data-id="${g.id}" type="button">حذف</button>
+          </div></td></tr>`).join("")
+      : `<tr><td colspan="5" class="empty">مفيش مجموعات للصف ده لسه، ضيف أول مجموعة من تحت</td></tr>`;
+  }
   if (!state.editingGroup || state.editingGroup.grade !== state.grade) resetGroupForm();
 }
 
 function resetGroupForm() {
   state.editingGroup = null;
   const n = gradeGroups(state.grade).length;
-  $("groupFormTitle").textContent = `إضافة مجموعة جديدة — ${GRADES[state.grade]}`;
-  $("gName").value = `المجموعة ${ORDINALS[n] || n + 1}`;
-  $("gTime").value = "";
+  if ($("groupFormTitle")) $("groupFormTitle").textContent = `إضافة مجموعة جديدة — ${GRADES[state.grade]}`;
+  if ($("gName")) $("gName").value = `المجموعة ${ORDINALS[n] || n + 1}`;
+  if ($("gTime")) $("gTime").value = "";
   document.querySelectorAll("#gDays input").forEach(c => (c.checked = false));
-  $("groupSave").textContent = "إضافة المجموعة";
-  $("groupCancel").hidden = true;
-  $("groupMsg").textContent = "";
+  if ($("groupSave")) $("groupSave").textContent = "إضافة المجموعة";
+  if ($("groupCancel")) $("groupCancel").hidden = true;
+  if ($("groupMsg")) $("groupMsg").textContent = "";
 }
 
-$("groupCancel").addEventListener("click", resetGroupForm);
+$("groupCancel")?.addEventListener("click", resetGroupForm);
 
-$("groupsBody").addEventListener("click", async e => {
+$("groupsBody")?.addEventListener("click", async e => {
   const b = e.target.closest("button[data-act]");
   if (!b) return;
   const g = state.groupById.get(Number(b.dataset.id));
@@ -271,13 +270,13 @@ $("groupsBody").addEventListener("click", async e => {
 
   if (b.dataset.act === "edit") {
     state.editingGroup = g;
-    $("groupFormTitle").textContent = `تعديل ${g.name} — ${GRADES[g.grade]}`;
-    $("gName").value = g.name;
-    $("gTime").value = g.start_time.slice(0, 5);
+    if ($("groupFormTitle")) $("groupFormTitle").textContent = `تعديل ${g.name} — ${GRADES[g.grade]}`;
+    if ($("gName")) $("gName").value = g.name;
+    if ($("gTime")) $("gTime").value = g.start_time.slice(0, 5);
     document.querySelectorAll("#gDays input").forEach(c => (c.checked = (g.days || []).includes(Number(c.value))));
-    $("groupSave").textContent = "حفظ التعديل";
-    $("groupCancel").hidden = false;
-    $("groupForm").scrollIntoView({ behavior: "smooth" });
+    if ($("groupSave")) $("groupSave").textContent = "حفظ التعديل";
+    if ($("groupCancel")) $("groupCancel").hidden = false;
+    $("groupForm")?.scrollIntoView({ behavior: "smooth" });
     return;
   }
 
@@ -288,7 +287,7 @@ $("groupsBody").addEventListener("click", async e => {
   }
 
   if (b.dataset.act === "del") {
-    if (!confirm(`متأكد إنك عاوز تمسح ${g.name}؟\nالطلاب اللي فيها هيبقوا من غير مجموعة.`)) return;
+    if (!confirm(`متأكد إنك عاوز تمسح ${g.name}؟`)) return;
     const { error } = await sb.from("groups").delete().eq("id", g.id);
     if (error) return toast(error.code === "23503" ? "المجموعة دي فيها حصص متسجلة، اوقفها بدل ما تمسحها" : errText(error));
     toast("المجموعة اتمسحت");
@@ -299,14 +298,14 @@ $("groupsBody").addEventListener("click", async e => {
   renderGroups();
 });
 
-$("groupForm").addEventListener("submit", async e => {
+$("groupForm")?.addEventListener("submit", async e => {
   e.preventDefault();
   const name = $("gName").value.trim();
   const time = $("gTime").value;
   const days = [...document.querySelectorAll("#gDays input:checked")].map(c => Number(c.value));
   if (!name) return ($("groupMsg").textContent = "اكتب اسم المجموعة");
   if (!time) return ($("groupMsg").textContent = "اختار وقت المجموعة");
-  $("groupMsg").textContent = "";
+  if ($("groupMsg")) $("groupMsg").textContent = "";
 
   const row = { name, start_time: time, days };
   const { error } = state.editingGroup
@@ -320,7 +319,6 @@ $("groupForm").addEventListener("submit", async e => {
   renderGroups();
 });
 
-// ================= تسجيل الحضور =================
 async function restoreActive() {
   const { data } = await sb.from("sessions").select("*").is("closed_at", null).maybeSingle();
   if (data) {
@@ -337,8 +335,8 @@ async function restoreActive() {
 
 function renderScan() {
   const live = !!state.active;
-  $("startCard").hidden = live;
-  $("liveView").hidden = !live;
+  if ($("startCard")) $("startCard").hidden = live;
+  if ($("liveView")) $("liveView").hidden = !live;
   if (live) { renderLive(); loadQrLib().catch(() => {}); }
   else fillStartForm();
   renderRecent();
@@ -347,65 +345,61 @@ function renderScan() {
 function fillStartForm() {
   const list = gradeGroups(state.grade, true);
   if (!list.length) {
-    $("sGroup").innerHTML = `<option value="">مفيش مجموعات شغالة — ضيفها من صفحة المجموعات</option>`;
-    $("sLesson").value = "";
-    $("sHint").textContent = "";
-    $("startBtn").disabled = true;
+    if ($("sGroup")) $("sGroup").innerHTML = `<option value="">مفيش مجموعات شغالة</option>`;
+    if ($("sLesson")) $("sLesson").value = "";
+    if ($("sHint")) $("sHint").textContent = "";
+    if ($("startBtn")) $("startBtn").disabled = true;
     return;
   }
-  $("startBtn").disabled = false;
-  const prev = Number($("sGroup").value);
-  $("sGroup").innerHTML = list.map(g =>
-    `<option value="${g.id}">${esc(groupLabel(g))}${g.days?.length ? " — " + esc(fmtDays(g.days)) : ""}</option>`).join("");
+  if ($("startBtn")) $("startBtn").disabled = false;
+  const prev = Number($("sGroup")?.value);
+  if ($("sGroup")) {
+    $("sGroup").innerHTML = list.map(g =>
+      `<option value="${g.id}">${esc(groupLabel(g))}${g.days?.length ? " — " + esc(fmtDays(g.days)) : ""}</option>`).join("");
+  }
 
   let pick = list.find(g => g.id === prev);
-  if (!pick) {
+  if (!pick && $("sGroup")) {
     const now = new Date(), mins = now.getHours() * 60 + now.getMinutes(), today = now.getDay();
     const toMins = t => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
     const todays = list.filter(g => (g.days || []).includes(today));
     pick = (todays.length ? todays : list)
       .slice().sort((a, b) => Math.abs(toMins(a.start_time) - mins) - Math.abs(toMins(b.start_time) - mins))[0];
+    $("sGroup").value = pick.id;
   }
-  $("sGroup").value = pick.id;
   updateLessonHint();
 }
 
-$("sGroup").addEventListener("change", updateLessonHint);
+$("sGroup")?.addEventListener("change", updateLessonHint);
 
 async function updateLessonHint() {
-  const gid = Number($("sGroup").value), grade = state.grade;
+  const gid = Number($("sGroup")?.value), grade = state.grade;
   if (!gid) return;
-  $("sHint").textContent = "";
+  if ($("sHint")) $("sHint").textContent = "";
   const [r1, r2] = await Promise.all([
     sb.from("sessions").select("lesson_no, day").eq("group_id", gid).order("lesson_no", { ascending: false }).limit(1),
     sb.from("sessions").select("lesson_no, day").eq("grade", grade).order("lesson_no", { ascending: false }).limit(1),
   ]);
-  if (Number($("sGroup").value) !== gid) return;
+  if (Number($("sGroup")?.value) !== gid) return;
   const groupLast = r1.data?.[0], gradeLast = r2.data?.[0];
-  $("sLesson").value = (groupLast?.lesson_no || 0) + 1;
-  $("sHint").textContent =
-    (groupLast ? `آخر حصة للمجموعة دي: الحصة ${groupLast.lesson_no} يوم ${fmtShort(groupLast.day)}.` : "دي أول حصة للمجموعة دي.") +
-    (gradeLast ? ` أعلى رقم حصة في الصف: ${gradeLast.lesson_no}.` : "") +
-    " المجموعات اللي بتاخد نفس الدرس لازم يبقى ليها نفس رقم الحصة.";
+  if ($("sLesson")) $("sLesson").value = (groupLast?.lesson_no || 0) + 1;
+  if ($("sHint")) {
+    $("sHint").textContent =
+      (groupLast ? `آخر حصة للمجموعة دي: الحصة ${groupLast.lesson_no}.` : "دي أول حصة للمجموعة دي.") +
+      (gradeLast ? ` أعلى رقم حصة في الصف: ${gradeLast.lesson_no}.` : "");
+  }
 }
 
-$("startBtn").addEventListener("click", () => startSession(Number($("sGroup").value), Number($("sLesson").value)));
+$("startBtn")?.addEventListener("click", () => startSession(Number($("sGroup")?.value), Number($("sLesson")?.value)));
 
 async function startSession(groupId, lessonNo) {
   if (!groupId) return toast("اختار المجموعة");
   if (!(lessonNo >= 1)) return toast("اكتب رقم الحصة");
 
-  // 1. منع فتح حصة ثانية لو كان هناك حصة جارية بالفعل
   const { data: openSession } = await sb.from("sessions").select("id, grade, group_id, lesson_no").is("closed_at", null).maybeSingle();
   if (openSession) {
     const groupName = state.groupById.get(openSession.group_id)?.name || "";
-    return alert(`⚠️ هناك حصة جارية بالفعل (${GRADES[openSession.grade]} - ${groupName} - الحصة ${openSession.lesson_no})!\nيجب إنهاء الحصة المفتوحة أولاً قبل فتح حصة جديدة.`);
-  }
-
-  // 2. التحقق من عدم تكرار رقم الحصة لنفس المجموعة
-  const { data: duplicate } = await sb.from("sessions").select("id").eq("group_id", groupId).eq("lesson_no", lessonNo).maybeSingle();
-  if (duplicate) {
-    return alert(`❌ الحصة رقم ${lessonNo} تم إنشاؤها وتأكيدها من قبل لهذه المجموعة!\nرجاء اختر رقم حصة جديد.`);
+    return alert(`⚠️ هناك حصة جارية بالفعل (${GRADES[openSession.grade]} - ${groupName})! يجب إنهاؤها أولاً.`);
   }
 
   const { data, error } = await sb.rpc("start_session", { p_group_id: groupId, p_lesson_no: lessonNo });
@@ -414,8 +408,8 @@ async function startSession(groupId, lessonNo) {
   state.grade = data.grade;
   lsSet(ACTIVE_KEY, String(data.id));
   invalidate(data.grade);
-  toast(data.resumed ? `رجعت للحصة ${data.lesson_no} (يوم ${fmtShort(data.day)})` : "بدأ تسجيل الحضور");
-  $("scanResult").hidden = true;
+  toast("بدأ تسجيل الحضور");
+  if ($("scanResult")) $("scanResult").hidden = true;
   lastScan = { code: null, at: 0 };
   await loadLive();
   renderGradeSegs();
@@ -433,25 +427,27 @@ async function loadLive() {
 
 function renderLive() {
   const se = state.active, g = state.groupById.get(se.group_id);
-  $("liveTitle").textContent = `${GRADES[se.grade]} ← ${groupLabel(g)}`;
-  $("liveSub").textContent = `الحصة ${se.lesson_no} · ${fmtDate(se.day)}`;
+  if ($("liveTitle")) $("liveTitle").textContent = `${GRADES[se.grade]} ← ${groupLabel(g)}`;
+  if ($("liveSub")) $("liveSub").textContent = `الحصة ${se.lesson_no} · ${fmtDate(se.day)}`;
   const gradeSize = state.students.filter(s => s.grade === se.grade).length;
-  $("liveCount").textContent = `(${state.live.length} من ${gradeSize} طالب في الصف)`;
-  $("liveBody").innerHTML = state.live.length
-    ? state.live.map(a => {
-        const s = state.byCode.get(a.student_code) || { full_name: "?" };
-        return `<tr>
-          <td>${fmtClock(a.scanned_at)}</td>
-          <td class="num"><b>${a.student_code}</b></td>
-          <td>${esc(s.full_name)}</td>
-          <td><button class="btn danger sm" data-del="${a.id}" type="button" title="إلغاء الحضور">✕</button></td></tr>`;
-      }).join("")
-    : `<tr><td colspan="4" class="empty">لسه محدش اتسجل، ابدأ امسح الـ QR</td></tr>`;
+  if ($("liveCount")) $("liveCount").textContent = `(${state.live.length} من ${gradeSize} طالب)`;
+  if ($("liveBody")) {
+    $("liveBody").innerHTML = state.live.length
+      ? state.live.map(a => {
+          const s = state.byCode.get(a.student_code) || { full_name: "?" };
+          return `<tr>
+            <td>${fmtClock(a.scanned_at)}</td>
+            <td class="num"><b>${a.student_code}</b></td>
+            <td>${esc(s.full_name)}</td>
+            <td><button class="btn danger sm" data-del="${a.id}" type="button">✕</button></td></tr>`;
+        }).join("")
+      : `<tr><td colspan="4" class="empty">لسه محدش اتسجل</td></tr>`;
+  }
 }
 
-$("liveBody").addEventListener("click", async e => {
+$("liveBody")?.addEventListener("click", async e => {
   const b = e.target.closest("button[data-del]");
-  if (!b || !confirm("تلغي حضور الطالب ده في الحصة دي؟")) return;
+  if (!b || !confirm("تلغي حضور الطالب ده؟")) return;
   const { error } = await sb.from("attendance").delete().eq("id", Number(b.dataset.del));
   if (error) return toast(errText(error));
   invalidate(state.active.grade);
@@ -459,7 +455,7 @@ $("liveBody").addEventListener("click", async e => {
   loadLive();
 });
 
-$("endBtn").addEventListener("click", async () => {
+$("endBtn")?.addEventListener("click", async () => {
   if (!state.active || !confirm("تنهي الحصة وتقفل تسجيل الحضور؟")) return;
   const { error } = await sb.from("sessions").update({ closed_at: new Date().toISOString() }).eq("id", state.active.id);
   if (error) return toast(errText(error));
@@ -475,13 +471,13 @@ $("endBtn").addEventListener("click", async () => {
 async function renderRecent() {
   const { data, error } = await sb.from("sessions")
     .select("id, grade, group_id, lesson_no, day, closed_at, attendance(count)")
-    .order("started_at", { ascending: false }).limit(12);
-  if (error) return;
+    .order("started_at", { ascending: false }).limit(10);
+  if (error || !$("recentBody")) return;
   $("recentBody").innerHTML = data.length
     ? data.map(s => {
         const isActive = state.active?.id === s.id;
         return `<tr>
-          <td>${esc(DAYS[new Date(s.day + "T00:00:00").getDay()])} ${fmtShort(s.day)}</td>
+        <td>${esc(DAYS[new Date(s.day + "T00:00:00").getDay()])} ${fmtShort(s.day)}</td>
           <td>${GRADES[s.grade]}</td>
           <td>${esc(groupLabel(state.groupById.get(s.group_id)))}</td>
           <td>الحصة ${s.lesson_no}</td>
@@ -495,7 +491,7 @@ async function renderRecent() {
     : `<tr><td colspan="7" class="empty">لسه مفيش حصص</td></tr>`;
 }
 
-$("recentBody").addEventListener("click", async e => {
+$("recentBody")?.addEventListener("click", async e => {
   const sheet = e.target.closest("button[data-sheet]");
   if (sheet) {
     const [grade, lesson] = sheet.dataset.sheet.split(":").map(Number);
@@ -508,7 +504,6 @@ $("recentBody").addEventListener("click", async e => {
   startSession(gid, lesson);
 });
 
-// ----- مسح الـ QR -----
 function beep(ok) {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -523,6 +518,7 @@ function beep(ok) {
 
 function showResult(type, html) {
   const el = $("scanResult");
+  if (!el) return;
   el.className = "scan-result " + type;
   el.innerHTML = html;
   el.hidden = false;
@@ -543,7 +539,7 @@ async function markAttendance(raw) {
   const info = `<b>${esc(data.full_name)}</b><br>كود ${data.code} · ${GRADES[data.grade]} · ${esc(data.track)}`;
   if (data.already) {
     beep(false);
-    showResult("warn", `⚠️ متسجل حضور قبل كده في الحصة دي${data.already_group ? ` (مع ${esc(data.already_group)})` : ""}<br>${info}`);
+    showResult("warn", `⚠️ متسجل حضور قبل كده في الحصة دي<br>${info}`);
   } else {
     beep(true);
     showResult("ok", `✅ تم تسجيل الحضور<br>${info}`);
@@ -552,15 +548,14 @@ async function markAttendance(raw) {
   }
 }
 
-$("manualForm").addEventListener("submit", e => {
+$("manualForm")?.addEventListener("submit", e => {
   e.preventDefault();
-  const v = $("manualCode").value;
-  $("manualCode").value = "";
+  const v = $("manualCode")?.value;
+  if ($("manualCode")) $("manualCode").value = "";
   lastScan = { code: null, at: 0 };
   markAttendance(v);
 });
 
-// ----- الكاميرا -----
 let qrLibLoading = null;
 function loadQrLib() {
   if (window.Html5Qrcode) return Promise.resolve();
@@ -568,12 +563,12 @@ function loadQrLib() {
     const s = document.createElement("script");
     s.src = "https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js";
     s.onload = ok;
-    s.onerror = () => { qrLibLoading = null; s.remove(); fail(new Error("مش قادر أحمّل قارئ الـ QR، اتأكد من النت وجرب تاني")); };
+    s.onerror = () => { qrLibLoading = null; s.remove(); fail(new Error("تعذر تحميل قارئ الـ QR")); };
     document.head.appendChild(s);
   });
 }
 
-let cameras = []; 
+let cameras = [];
 let camIndex = -1;
 
 const QR_ONLY = () => ({ formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE], verbose: false });
@@ -584,6 +579,7 @@ const SCAN_CFG = {
 };
 
 function camHelp(html) {
+  if (!$("camHelp")) return;
   $("camHelp").innerHTML = html || "";
   $("camHelp").hidden = !html;
 }
@@ -592,19 +588,12 @@ function cameraProblem(err) {
   const name = err?.name || "";
   const msg = String(err?.message || err || "");
   if (!window.isSecureContext)
-    return `الكاميرا مش بتشتغل غير لو الموقع مفتوح بـ <b>https</b>، وانت فاتح <b class="ltr-inline">${esc(location.origin)}</b>.<br>
-      ارفع المنصة (مثلاً على Netlify) وافتح الرابط اللي بيبدأ بـ https. لحد كده استخدم «صوّر الـ QR».`;
+    return `الكاميرا تتطلب اتصال آمن (HTTPS). استخدم زر «صوّر الـ QR».`;
   if (!navigator.mediaDevices?.getUserMedia)
-    return `المتصفح ده مش بيدعم الكاميرا. لو فاتح الرابط من واتساب أو فيسبوك، افتحه في <b>Chrome</b> أو <b>Safari</b>
-      (من ⋮ ← فتح في المتصفح). لحد كده استخدم «صوّر الـ QR».`;
+    return `متصفحك لا يدعم الكاميرا. استخدم زر «صوّر الـ QR».`;
   if (name === "NotAllowedError" || /permission|denied|not allowed/i.test(msg))
-    return `إذن الكاميرا مرفوض. دوس على علامة 🔒 جنب الرابط فوق ← <b>الأذونات</b> ← <b>الكاميرا</b> ← <b>سماح</b>، وبعدين جرّب تاني.
-      <br>على الآيفون: الإعدادات ← Safari ← الكاميرا ← سماح.`;
-  if (name === "NotFoundError" || /not ?found|no camera/i.test(msg))
-    return `مش لاقي كاميرا على الجهاز ده. استخدم «صوّر الـ QR» أو اكتب الكود.`;
-  if (name === "NotReadableError" || /could not start|in use|notreadable/i.test(msg))
-    return `الكاميرا مفتوحة في تطبيق تاني. اقفل أي تطبيق بيستخدم الكاميرا وجرّب تاني.`;
-  return `مش قادر أفتح الكاميرا (${esc(msg)}). جرّب «صوّر الـ QR» أو اكتب الكود.`;
+    return `إذن الكاميرا مرفوض. يرجى السماح بالكاميرا من إعدادات المتصفح.`;
+  return `تعذر فتح الكاميرا (${esc(msg)}). استخدم «صوّر الـ QR».`;
 }
 
 function pickBackCamera(list) {
@@ -615,8 +604,8 @@ function pickBackCamera(list) {
 async function startCamera() {
   camHelp("");
   if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) return camHelp(cameraProblem());
-  $("camBtn").disabled = true;
-  try { await loadQrLib(); } catch (err) { $("camBtn").disabled = false; return camHelp(esc(err.message)); }
+  if ($("camBtn")) $("camBtn").disabled = true;
+  try { await loadQrLib(); } catch (err) { if ($("camBtn")) $("camBtn").disabled = false; return camHelp(esc(err.message)); }
   scanner = new Html5Qrcode("reader", QR_ONLY());
   const onScan = text => markAttendance(text);
   try {
@@ -630,16 +619,16 @@ async function startCamera() {
       camIndex = pickBackCamera(cameras);
       await scanner.start(cameras[camIndex].id, SCAN_CFG, onScan, () => {});
     }
-    $("camBtn").textContent = "⏹ إيقاف الكاميرا";
+    if ($("camBtn")) $("camBtn").textContent = "⏹ إيقاف الكاميرا";
     if (!cameras.length) cameras = await Html5Qrcode.getCameras().catch(() => []);
-    $("switchCamBtn").hidden = cameras.length < 2;
+    if ($("switchCamBtn")) $("switchCamBtn").hidden = cameras.length < 2;
   } catch (err) {
     try { scanner.clear(); } catch {}
     scanner = null;
-    $("reader").innerHTML = "";
+    if ($("reader")) $("reader").innerHTML = "";
     camHelp(cameraProblem(err));
   } finally {
-    $("camBtn").disabled = false;
+    if ($("camBtn")) $("camBtn").disabled = false;
   }
 }
 
@@ -647,14 +636,13 @@ async function stopCamera() {
   if (!scanner) return;
   try { await scanner.stop(); scanner.clear(); } catch {}
   scanner = null;
-  $("reader").innerHTML = "";
-  $("camBtn").textContent = "📷 تشغيل الكاميرا";
-  $("switchCamBtn").hidden = true;
+  if ($("reader")) $("reader").innerHTML = "";
+  if ($("camBtn")) $("camBtn").textContent = "📷 تشغيل الكاميرا";
+  if ($("switchCamBtn")) $("switchCamBtn").hidden = true;
 }
 
-$("camBtn").addEventListener("click", () => (scanner ? stopCamera() : startCamera()));
-
-$("switchCamBtn").addEventListener("click", async () => {
+$("camBtn")?.addEventListener("click", () => (scanner ? stopCamera() : startCamera()));
+$("switchCamBtn")?.addEventListener("click", async () => {
   if (cameras.length < 2) return;
   camIndex = ((camIndex < 0 ? pickBackCamera(cameras) : camIndex) + 1) % cameras.length;
   await stopCamera();
@@ -665,7 +653,7 @@ document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") stopCamera();
 });
 
-$("qrFile").addEventListener("change", async e => {
+$("qrFile")?.addEventListener("change", async e => {
   const file = e.target.files?.[0];
   e.target.value = "";
   if (!file || !state.active) return;
@@ -677,13 +665,12 @@ $("qrFile").addEventListener("change", async e => {
     await markAttendance(text);
   } catch {
     beep(false);
-    showResult("err", "مش لاقي QR في الصورة. قرّب الموبايل من الـ QR وخلي الصورة واضحة وجرّب تاني.");
+    showResult("err", "تعذر قراءة الـ QR من الصورة، يرجى المحاولة بصورة أوضح.");
   } finally {
     try { reader.clear(); } catch {}
   }
 });
 
-// ================= حساب سجل الحضور =================
 function lessonsOf(sessions) {
   const map = new Map();
   for (const s of sessions) {
@@ -755,18 +742,20 @@ function registerHTML(grade) {
 function renderRegister() {
   const data = state.gradeData[state.grade];
   const n = lessonsOf(data.sessions).length;
-  $("regContent").innerHTML =
-    (n ? "" : `<p class="muted">لسه مفيش حصص متسجلة للصف ده. أول ما تبدأ تسجيل حضور هتظهر هنا.</p>`) +
-    registerHTML(state.grade);
+  if ($("regContent")) {
+    $("regContent").innerHTML =
+      (n ? "" : `<p class="muted">لسه مفيش حصص متسجلة للصف ده.</p>`) +
+      registerHTML(state.grade);
+  }
 }
 
-$("regPdf").addEventListener("click", async () => {
+$("regPdf")?.addEventListener("click", async () => {
   const grade = state.grade;
   await loadGradeData(grade);
   const n = lessonsOf(state.gradeData[grade].sessions).length;
-  const legend = `<div class="legend"><span><b class="m-yes">حضر</b> (وتحتها ميعاد المجموعة اللي حضر معاها)</span><span><b class="m-no">غائب</b></span><span>— لسه ماكانش مسجل</span></div>`;
+  const legend = `<div class="legend"><span><b class="m-yes">حضر</b></span><span><b class="m-no">غائب</b></span></div>`;
   printDoc(`${GRADES[grade]} – سجل الحضور`,
-    `عدد الحصص: ${n} · عدد الطلاب: ${state.students.filter(s => s.grade === grade).length} · تاريخ التقرير: ${fmtDateTime(new Date())}`,
+    `عدد الحصص: ${n} · عدد الطلاب: ${state.students.filter(s => s.grade === grade).length}`,
     legend + registerHTML(grade), n > 18 ? "small" : "");
 });
 
@@ -801,26 +790,26 @@ async function printLessonSheet(grade, lessonNo) {
       <div class="no"><b>${absent}</b>غائب</div>
     </div>
     <table><thead><tr><th>#</th><th>اسم الطالب</th><th>الكود</th><th>الحالة</th><th>حضر مع</th><th>وقت الحضور</th></tr></thead>
-    <tbody>${rows || '<tr><td colspan="6" class="empty">مفيش طلاب في الصف ده</td></tr>'}</tbody></table>`;
-  printDoc(`${GRADES[grade]} – الحصة ${lessonNo} – كشف الحضور`,
-    `${days} · المجموعات: ${groups} · تاريخ التقرير: ${fmtDateTime(new Date())}`, body, "", false);
+    <tbody>${rows || '<tr><td colspan="6" class="empty">مفيش طلاب</td></tr>'}</tbody></table>`;
+  printDoc(`${GRADES[grade]} – الحصة ${lessonNo} – كشف الحضور`, `${days} · المجموعات: ${groups}`, body, "", false);
 }
 
-$("liveSheetBtn").addEventListener("click", () => {
+$("liveSheetBtn")?.addEventListener("click", () => {
   if (state.active) printLessonSheet(state.active.grade, state.active.lesson_no);
 });
 
-// ================= الحسابات =================
 function renderPayments() {
   const grade = state.grade;
   const data = state.gradeData[grade];
   const set = state.settings[grade] || { price: 0, lessons_count: 12 };
   const price = Number(set.price) || 0, n = Number(set.lessons_count) || 12;
-  if (document.activeElement !== $("setPrice")) $("setPrice").value = price;
-  if (document.activeElement !== $("setCount")) $("setCount").value = n;
-  $("setHint").textContent = price
-    ? `سعر الحصة = ${price} ÷ ${n} = ${(price / n).toFixed(2)} جنيه تقريبًا. المستحق = عدد الحصص اللي حضرها × سعر الحصة.`
-    : "حدد سعر الصف وعدد الحصص في الفترة عشان المبالغ تتحسب.";
+  if ($("setPrice") && document.activeElement !== $("setPrice")) $("setPrice").value = price;
+  if ($("setCount") && document.activeElement !== $("setCount")) $("setCount").value = n;
+  if ($("setHint")) {
+    $("setHint").textContent = price
+      ? `سعر الحصة = ${price} ÷ ${n} = ${(price / n).toFixed(2)} ج. المستحق = عدد الحصص اللي حضرها × سعر الحصة.`
+      : "حدد سعر الصف وعدد الحصص في الفترة.";
+  }
 
   const R = buildRegister(data);
   const maxLesson = R.lessons.length ? R.lessons[R.lessons.length - 1].no : 0;
@@ -828,42 +817,50 @@ function renderPayments() {
   let p = state.period[grade];
   if (!p || p > periods) p = periods;
   state.period[grade] = p;
-  $("payPeriod").innerHTML = Array.from({ length: periods }, (_, i) =>
-    `<option value="${i + 1}">الفترة ${i + 1} (الحصص ${i * n + 1}–${(i + 1) * n})</option>`).join("");
-  $("payPeriod").value = p;
+  if ($("payPeriod")) {
+    $("payPeriod").innerHTML = Array.from({ length: periods }, (_, i) =>
+      `<option value="${i + 1}">الفترة ${i + 1} (الحصص ${i * n + 1}–${(i + 1) * n})</option>`).join("");
+    $("payPeriod").value = p;
+  }
 
   const periodLessons = R.lessons.filter(l => l.no > (p - 1) * n && l.no <= p * n);
   const done = periodLessons.length >= n;
-  $("payTitle").innerHTML = `${GRADES[grade]} — الفترة ${p} ` + (done
-    ? `<span class="badge ok">اكتملت</span>`
-    : `<span class="badge warn">جارية: ${periodLessons.length} من ${n} حصة</span>`);
+  if ($("payTitle")) {
+    $("payTitle").innerHTML = `${GRADES[grade]} — الفترة ${p} ` + (done
+      ? `<span class="badge ok">اكتملت</span>`
+      : `<span class="badge warn">جارية: ${periodLessons.length}/${n}</span>`);
+  }
 
   const rows = payRows(grade, p, periodLessons, R, price, n);
   const totalDue = rows.reduce((t, r) => t + r.due, 0);
   const paid = rows.reduce((t, r) => t + (r.pay ? Number(r.pay.amount) : 0), 0);
   const remaining = rows.filter(r => !r.pay).reduce((t, r) => t + r.due, 0);
-  $("payTotals").innerHTML = `
-    <div class="stat"><div class="k">إجمالي المستحق</div><div class="v">${money(totalDue)}</div></div>
-    <div class="stat"><div class="k">المدفوع</div><div class="v" style="color:var(--ok)">${money(paid)}</div><div class="s">${rows.filter(r => r.pay).length} طالب</div></div>
-    <div class="stat"><div class="k">المتبقي</div><div class="v" style="color:var(--err)">${money(remaining)}</div><div class="s">${rows.filter(r => !r.pay).length} طالب</div></div>`;
+  
+  if ($("payTotals")) {
+    $("payTotals").innerHTML = `
+      <div class="stat"><div class="k">إجمالي المستحق</div><div class="v">${money(totalDue)}</div></div>
+      <div class="stat"><div class="k">المدفوع</div><div class="v" style="color:var(--ok)">${money(paid)}</div></div>
+      <div class="stat"><div class="k">المتبقي</div><div class="v" style="color:var(--err)">${money(remaining)}</div></div>`;
+  }
 
-  const q = $("paySearch").value.trim().toLowerCase(), f = $("payFilter").value;
+  const q = $("paySearch")?.value.trim().toLowerCase() || "", f = $("payFilter")?.value || "";
   const shown = rows.filter(r =>
     (!f || (f === "paid") === !!r.pay) &&
     (!q || r.s.full_name.toLowerCase().includes(q) || String(r.s.code).includes(q)));
 
-  $("payBody").innerHTML = shown.length
-    ? shown.map(r => `<tr>
-        <td>${esc(r.s.full_name)}</td>
-        <td class="num"><b>${r.s.code}</b></td>
-        <td>${r.held}</td><td><b class="m-yes">${r.present}</b></td><td><b class="m-no">${r.absent}</b></td>
-        <td><b>${money(r.due)}</b></td>
-        <td>${r.pay
-          ? `<span class="badge ok">✅ تم الدفع ${money(r.pay.amount)}</span>
-             <span class="paid-at">${fmtDateTime(r.pay.paid_at)}${r.pay.paid_by ? " · " + esc(r.pay.paid_by) : ""}
-             <button class="btn ghost sm" style="min-height:26px;padding:0 8px" data-unpay="${r.pay.id}" type="button">إلغاء</button></span>`
-          : `<button class="btn sm" data-pay="${r.s.code}" data-amount="${r.due}" type="button">تأكيد الدفع</button>`}</td></tr>`).join("")
-    : `<tr><td colspan="7" class="empty">مفيش طلاب</td></tr>`;
+  if ($("payBody")) {
+    $("payBody").innerHTML = shown.length
+      ? shown.map(r => `<tr>
+          <td>${esc(r.s.full_name)}</td>
+          <td class="num"><b>${r.s.code}</b></td>
+          <td>${r.held}</td><td><b class="m-yes">${r.present}</b></td><td><b class="m-no">${r.absent}</b></td>
+          <td><b>${money(r.due)}</b></td>
+          <td>${r.pay
+            ? `<span class="badge ok">✅ تم الدفع ${money(r.pay.amount)}</span>
+               <button class="btn ghost sm" style="min-height:26px;padding:0 8px;margin-inline-start:6px" data-unpay="${r.pay.id}" type="button">إلغاء</button>`
+            : `<button class="btn sm" data-pay="${r.s.code}" data-amount="${r.due}" type="button">تأكيد الدفع</button>`}</td></tr>`).join("")
+      : `<tr><td colspan="7" class="empty">مفيش طلاب</td></tr>`;
+  }
 }
 
 function payRows(grade, p, periodLessons, R, price, n) {
@@ -874,11 +871,11 @@ function payRows(grade, p, periodLessons, R, price, n) {
   });
 }
 
-$("payPeriod").addEventListener("change", () => { state.period[state.grade] = Number($("payPeriod").value); renderPayments(); });
-$("payFilter").addEventListener("change", renderPayments);
-$("paySearch").addEventListener("input", renderPayments);
+$("payPeriod")?.addEventListener("change", () => { state.period[state.grade] = Number($("payPeriod").value); renderPayments(); });
+$("payFilter")?.addEventListener("change", renderPayments);
+$("paySearch")?.addEventListener("input", renderPayments);
 
-$("payBody").addEventListener("click", async e => {
+$("payBody")?.addEventListener("click", async e => {
   const grade = state.grade, p = state.period[grade], data = state.gradeData[grade];
   const pay = e.target.closest("button[data-pay]");
   const unpay = e.target.closest("button[data-unpay]");
@@ -905,7 +902,7 @@ $("payBody").addEventListener("click", async e => {
   }
 });
 
-$("settingsForm").addEventListener("submit", async e => {
+$("settingsForm")?.addEventListener("submit", async e => {
   e.preventDefault();
   const price = Number($("setPrice").value), count = Number($("setCount").value);
   if (!(price >= 0)) return toast("اكتب سعر صحيح");
@@ -915,11 +912,10 @@ $("settingsForm").addEventListener("submit", async e => {
   if (error) return toast(errText(error));
   state.settings[state.grade] = data;
   toast("الإعدادات اتحفظت");
-  $("setPrice").blur(); $("setCount").blur();
   renderPayments();
 });
 
-$("payPdf").addEventListener("click", () => {
+$("payPdf")?.addEventListener("click", () => {
   const grade = state.grade, data = state.gradeData[grade];
   if (!data) return;
   const set = state.settings[grade] || { price: 0, lessons_count: 12 };
@@ -927,61 +923,44 @@ $("payPdf").addEventListener("click", () => {
   const R = buildRegister(data);
   const periodLessons = R.lessons.filter(l => l.no > (p - 1) * n && l.no <= p * n);
   const rows = payRows(grade, p, periodLessons, R, price, n);
-  const body = `<table><thead><tr><th>#</th><th>الطالب</th><th>الكود</th><th>عدد الحصص</th><th>حضر</th><th>غاب</th><th>المبلغ المستحق</th><th>حالة الدفع</th></tr></thead><tbody>` +
+  const body = `<table><thead><tr><th>#</th><th>الطالب</th><th>الكود</th><th>حضر</th><th>غاب</th><th>المبلغ المستحق</th><th>حالة الدفع</th></tr></thead><tbody>` +
     rows.map((r, i) => `<tr><td>${i + 1}</td><td class="name">${esc(r.s.full_name)}</td><td>${r.s.code}</td>
-      <td>${r.held}</td><td>${r.present}</td><td>${r.absent}</td>
+      <td>${r.present}</td><td>${r.absent}</td>
       <td><b>${money(r.due)}</b></td>
-      <td>${r.pay ? `✅ دفع ${money(r.pay.amount)}<span class="paid-at">${fmtDateTime(r.pay.paid_at)}</span>` : "⬜ لم يدفع"}</td></tr>`).join("") +
+      <td>${r.pay ? `✅ دفع ${money(r.pay.amount)}` : "⬜ لم يدفع"}</td></tr>`).join("") +
     `</tbody></table>`;
-  const total = rows.reduce((t, r) => t + r.due, 0), paid = rows.reduce((t, r) => t + (r.pay ? Number(r.pay.amount) : 0), 0);
-  printDoc(`${GRADES[grade]} – الحسابات (الفترة ${p})`,
-    `سعر الصف ${price} ج · ${n} حصة · الحصص المنتهية ${periodLessons.length} · إجمالي المستحق ${money(total)} · المدفوع ${money(paid)} · تاريخ التقرير: ${fmtDateTime(new Date())}`,
-    body, "");
+  printDoc(`${GRADES[grade]} – الحسابات (الفترة ${p})`, `إجمالي الحصص: ${periodLessons.length}`, body, "");
 });
 
-// ================= PDF =================
 function printDoc(title, subtitle, bodyHTML, extraClass, landscape = true) {
   const w = window.open("", "_blank");
-  if (!w) return toast("المتصفح منع فتح صفحة التقرير، اسمح بالنوافذ المنبثقة (popups)");
+  if (!w) return toast("المتصفح منع فتح صفحة التقرير");
   w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>${esc(title)}</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   @page { size: A4 ${landscape ? "landscape" : "portrait"}; margin: 10mm; }
   body { font-family: Cairo, sans-serif; color: #000; margin: 0; padding: 12px; }
   h1 { font-size: 18px; margin: 0; } .sub { color: #555; font-size: 12px; margin-bottom: 10px; }
-  h3 { font-size: 14px; margin: 16px 0 6px; } h3 small { color: #555; font-weight: 600; margin-inline-start: 8px; }
   table { width: 100%; border-collapse: collapse; font-size: 11px; }
-  body.small table { font-size: 9px; }
-  tr { page-break-inside: avoid; } thead { display: table-header-group; }
-  th, td { border: 1px solid #999; padding: 3px 5px; text-align: center; }
-  th { background: #eef1f7; } td.name { text-align: right; white-space: nowrap; }
-  th small { display: block; font-weight: 600; color: #555; font-size: 9px; }
+  th, td { border: 1px solid #999; padding: 4px; text-align: center; }
+  th { background: #eef1f7; } td.name { text-align: right; }
   .summary { display: flex; gap: 10px; margin: 0 0 12px; }
-  .summary div { flex: 1; border: 1px solid #ccc; border-radius: 8px; padding: 6px 10px; text-align: center; font-size: 12px; }
-  .summary b { display: block; font-size: 20px; }
+  .summary div { flex: 1; border: 1px solid #ccc; padding: 6px; text-align: center; }
+  .summary b { display: block; font-size: 18px; }
   .summary .yes b { color: #0a7a3f; } .summary .no b { color: #c43131; }
-  tr.absent td { background: #fdecee; }
-  .m-yes { color: #0a7a3f; font-weight: 800; } .m-grp { display: block; color: #555; font-size: 8px; font-weight: 600; }
-  .m-no { color: #c43131; font-weight: 800; } .m-na { color: #999; }
-  .legend { font-size: 11px; color: #555; } .legend span { margin-inline-end: 14px; }
-  .paid-at { display: block; color: #555; font-size: 9px; } .empty { color: #777; }
-  .table-wrap { overflow: visible; } .reg-group { page-break-inside: auto; }
-  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .m-yes { color: #0a7a3f; font-weight: 800; } .m-no { color: #c43131; font-weight: 800; }
 </style></head><body class="${extraClass}"><h1>${esc(title)}</h1><div class="sub">${esc(subtitle)}</div>${bodyHTML}
 <script>document.fonts.ready.then(() => setTimeout(() => print(), 300));<\/script></body></html>`);
   w.document.close();
 }
 
-// ================= الطلاب =================
 const gradeOpts = Object.entries(GRADES).map(([v, t]) => `<option value="${v}">${t}</option>`).join("");
 $("fGrade")?.insertAdjacentHTML("beforeend", gradeOpts);
 
-// تحديث خيارات الشعب حسب الصف المختار في الفلتر
 function updateFilterTracks() {
   const gradeVal = $("fGrade")?.value;
   const trackSelect = $("fTrack");
   if (!trackSelect) return;
-
   const tracks = gradeVal ? (TRACKS_BY_GRADE[gradeVal] || []) : ["عام", "أدبي", "علمي", "علمي علوم", "علمي رياضة"];
   trackSelect.innerHTML = '<option value="">كل الشعب</option>' + tracks.map(t => `<option value="${t}">${t}</option>`).join("");
 }
@@ -992,8 +971,8 @@ $("fGrade")?.addEventListener("change", () => {
 });
 
 function filteredStudents() {
-  const q = $("search").value.trim().toLowerCase();
-  const g = $("fGrade").value, t = $("fTrack").value;
+  const q = $("search")?.value.trim().toLowerCase() || "";
+  const g = $("fGrade")?.value || "", t = $("fTrack")?.value || "";
   return state.students.filter(s =>
     (!g || s.grade === Number(g)) &&
     (!t || s.track === t) &&
@@ -1003,13 +982,15 @@ function filteredStudents() {
 
 function renderStudents() {
   const list = filteredStudents();
-  $("studentsCount").textContent = `(${list.length})`;
-  $("studentsBody").innerHTML = list.length
-    ? list.map(s => `<tr>
-        <td class="num"><b>${s.code}</b></td><td>${esc(s.full_name)}</td><td class="num">${esc(s.phone)}</td>
-        <td>${esc(s.gender)}</td><td>${esc(s.governorate)}</td><td>${GRADES[s.grade]}</td><td>${esc(s.track)}</td>
-        <td>${new Date(s.created_at).toLocaleDateString("ar-EG-u-nu-latn")}</td></tr>`).join("")
-    : `<tr><td colspan="8" class="empty">مفيش طلاب</td></tr>`;
+  if ($("studentsCount")) $("studentsCount").textContent = `(${list.length})`;
+  if ($("studentsBody")) {
+    $("studentsBody").innerHTML = list.length
+      ? list.map(s => `<tr>
+          <td class="num"><b>${s.code}</b></td><td>${esc(s.full_name)}</td><td class="num">${esc(s.phone)}</td>
+          <td>${esc(s.gender)}</td><td>${esc(s.governorate)}</td><td>${GRADES[s.grade]}</td><td>${esc(s.track)}</td>
+          <td>${new Date(s.created_at).toLocaleDateString("ar-EG-u-nu-latn")}</td></tr>`).join("")
+      : `<tr><td colspan="8" class="empty">مفيش طلاب</td></tr>`;
+  }
 }
 
 ["search", "fTrack"].forEach(id => $(id)?.addEventListener("input", renderStudents));
@@ -1025,19 +1006,14 @@ $("csvBtn")?.addEventListener("click", () => {
   a.click();
 });
 
-// ================= طباعة كروت الـ QR لجميع الطلاب =================
 $("qrPdfBtn")?.addEventListener("click", () => {
   const list = filteredStudents();
-
-  if (!list || !list.length) {
-    return toast("مفيش طلاب متاحين للطباعة حسب الفلتر الحالي");
-  }
+  if (!list || !list.length) return toast("مفيش طلاب متاحين للطباعة");
 
   const printArea = $("printQrArea");
   if (!printArea) return;
   printArea.innerHTML = "";
 
-  // تقسيم الطلاب لصفحات A4 (كل صفحة تحتوي على 4 كروت متوسطة الحجم)
   const pageSize = 4;
   for (let i = 0; i < list.length; i += pageSize) {
     const pageStudents = list.slice(i, i + pageSize);
@@ -1045,7 +1021,6 @@ $("qrPdfBtn")?.addEventListener("click", () => {
     pageDiv.className = "qr-page";
 
     pageStudents.forEach(st => {
-      // توليد الـ QR Code
       const qr = qrcode(0, "M");
       qr.addData(String(st.code));
       qr.make();
@@ -1066,32 +1041,20 @@ $("qrPdfBtn")?.addEventListener("click", () => {
         <div class="qr-svg-wrap">${qrSvg}</div>
         <div class="card-info">
           <div class="info-grid">
-            <div class="info-item">
-              <span>الصف</span>
-              <b>${esc(gradeText)}</b>
-            </div>
-            <div class="info-item">
-              <span>الشعبة</span>
-              <b>${esc(trackText)}</b>
-            </div>
+            <div class="info-item"><span>الصف</span><b>${esc(gradeText)}</b></div>
+            <div class="info-item"><span>الشعبة</span><b>${esc(trackText)}</b></div>
           </div>
         </div>
       `;
       pageDiv.appendChild(card);
     });
-
     printArea.appendChild(pageDiv);
   }
 
-  // تفعيل وضع الطباعة
   document.body.classList.add("printing-qr");
-
-  setTimeout(() => {
-    window.print();
-  }, 300);
+  setTimeout(() => window.print(), 300);
 });
 
-// تنظيف الشاشة وإعادة وضع الصفحة للوضع الطبيعي بعد إنهاء الطباعة
 window.addEventListener("afterprint", () => {
   document.body.classList.remove("printing-qr");
   const printArea = $("printQrArea");
